@@ -7,13 +7,13 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { useEffect, useState } from "react"
-import { AddMealModal } from "@/components/add-meal-modal"
-import { EditMealModal } from "@/components/edit-meal-modal"
-import { DeleteMealModal } from "@/components/delete-meal-modal"
+import { AddFoodModal } from "@/components/add-food-modal"
+import { EditFoodModal } from "@/components/edit-food-modal"
+import { DeleteFoodModal } from "@/components/delete-food-modal"
 import { FoodItem, getFoods, deleteFood } from "@/lib/api"
 
-// Default featured meals in case API is not available
-const defaultMeals = [
+// Default featured food items in case API is not available
+const defaultFoods: FoodItem[] = [
   {
     _id: '1',
     name: "Bow Lasagna",
@@ -22,7 +22,7 @@ const defaultMeals = [
     image: "/images/placeholder.svg?height=200&width=300",
     restaurant: "Denny's",
     status: "Closed",
-    logo: "🍽️",
+    logo: "🍗",
   },
   {
     _id: '2',
@@ -32,7 +32,7 @@ const defaultMeals = [
     image: "/images/placeholder.svg?height=200&width=300",
     restaurant: "Fruit King",
     status: "Closed",
-    logo: "🥑",
+    logo: "🍗",
   },
   {
     _id: '3',
@@ -48,109 +48,109 @@ const defaultMeals = [
     _id: '4',
     name: "Cupcake",
     price: 1.99,
-    rating: 4.2,
+    rating: 4.7,
     image: "/images/placeholder.svg?height=200&width=300",
-    restaurant: "Sweet Treats",
+    restaurant: "Sweet Tooth",
     status: "Open",
     logo: "🧁",
   },
   {
     _id: '5',
-    name: "Creamy Steak",
-    price: 12.99,
-    rating: 4.5,
+    name: "Burger",
+    price: 8.99,
+    rating: 4.6,
     image: "/images/placeholder.svg?height=200&width=300",
-    restaurant: "Steaky",
+    restaurant: "Burger Joint",
     status: "Open",
     logo: "🥩",
   },
   {
     _id: '6',
-    name: "Steak with Potatoes",
-    price: 15.99,
-    rating: 4.7,
+    name: "Pizza",
+    price: 12.99,
+    rating: 4.9,
     image: "/images/placeholder.svg?height=200&width=300",
-    restaurant: "KFC",
+    restaurant: "Pizza Palace",
     status: "Open",
     logo: "🍗",
   },
   {
     _id: '7',
-    name: "Indian Spicy Soup",
-    price: 9.99,
-    rating: 4.5,
+    name: "Salad",
+    price: 7.99,
+    rating: 4.3,
     image: "/images/placeholder.svg?height=200&width=300",
-    restaurant: "Spice Palace",
+    restaurant: "Healthy Bites",
     status: "Open",
-    logo: "🍛",
+    logo: "🍗",
   },
   {
     _id: '8',
-    name: "Steak Omelet",
+    name: "Breakfast Platter",
     price: 11.99,
     rating: 4.9,
     image: "/images/placeholder.svg?height=200&width=300",
     restaurant: "Breakfast Club",
     status: "Open",
-    logo: "🍳",
+    logo: "🍗",
   },
 ];
 
 export default function HomePage() {
-  const [meals, setMeals] = useState<FoodItem[]>([]);
+  const [foods, setFoods] = useState<FoodItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedMeal, setSelectedMeal] = useState<FoodItem | null>(null);
+  const [selectedFood, setSelectedFood] = useState<FoodItem | null>(null);
 
-  // Fetch meals from the API
+  // Fetch food items from the API
   useEffect(() => {
-    const fetchMeals = async () => {
+    const fetchFoods = async () => {
       try {
         setLoading(true);
         const data = await getFoods();
-        setMeals(data);
+        setFoods(data);
       } catch (err) {
-        console.error('Failed to fetch meals:', err);
-        setError('Failed to load meals. Using sample data.');
-        setMeals(defaultMeals);
+        console.error('Failed to fetch food items:', err);
+        setError('Failed to load food items. Using sample data.');
+        setFoods(defaultFoods);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchMeals();
+    fetchFoods();
   }, []);
 
-  const handleAddMeal = (newMeal: FoodItem) => {
-    setMeals([...meals, newMeal]);
+  const handleAddFood = (newFood: FoodItem) => {
+    setFoods([...foods, newFood]);
   };
 
-  const handleUpdateMeal = (updatedMeal: FoodItem) => {
-    setMeals(meals.map(meal => 
-      meal._id === updatedMeal._id ? updatedMeal : meal
+  const handleUpdateFood = (updatedFood: FoodItem) => {
+    setFoods(foods.map(food => 
+      food._id === updatedFood._id ? updatedFood : food
     ));
   };
 
-  const handleDeleteMeal = async (id: string) => {
+  const handleDeleteFood = async (id: string) => {
     try {
       await deleteFood(id);
-      setMeals(meals.filter(meal => meal._id !== id));
+      setFoods(foods.filter(food => food._id !== id));
     } catch (err) {
-      console.error('Failed to delete meal:', err);
-      setError('Failed to delete meal.');
+      console.error('Failed to delete food item:', err);
+      setError('Failed to delete food item.');
     }
   };
 
-  const handleEdit = (meal: any) => {
-    setSelectedMeal(meal)
+  const handleEdit = (food: FoodItem) => {
+    setSelectedFood(food)
     setShowEditModal(true)
   }
 
-  const handleDelete = (meal: any) => {
-    setSelectedMeal(meal)
+  const handleDelete = (food: FoodItem) => {
+    setSelectedFood(food)
     setShowDeleteModal(true)
   }
 
@@ -165,7 +165,7 @@ export default function HomePage() {
               <span className="text-xl font-bold text-gray-900">FoodWagen</span>
             </div>
             <Button className="bg-orange-400 hover:bg-orange-500 text-white px-6" onClick={() => setShowAddModal(true)}>
-              Add Meal
+              Add Food Item
             </Button>
           </div>
         </div>
@@ -198,7 +198,7 @@ export default function HomePage() {
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                     <Input placeholder="What do you like to eat today?" className="pl-10 h-12 border-gray-200 text-gray-900" />
                   </div>
-                  <Button className="bg-orange-500 hover:bg-orange-600 text-white px-6 h-12">Find Meal</Button>
+                  <Button className="bg-orange-500 hover:bg-orange-600 text-white px-6 h-12">Find Food</Button>
                 </div>
               </div>
             </div>
@@ -220,24 +220,24 @@ export default function HomePage() {
       {/* Featured Meals Section */}
       <section className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">Featured Meals</h2>
+          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">Featured Food Items</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {defaultMeals.map((meal) => (
+            {foods.map((food) => (
               <div
-                key={meal._id}
+                key={food._id}
                 className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
               >
                 <div className="relative">
                   <Image
-                    src={meal.image || "/images/food.png"}
-                    alt={meal.name}
+                    src={food.image || "/images/food.png"}
+                    alt={food.name}
                     width={300}
                     height={200}
                     className="w-full h-48 object-cover"
                   />
                   <div className="absolute top-3 left-3">
-                    <Badge className="bg-orange-500 text-white">${meal.price}</Badge>
+                    <Badge className="bg-orange-500 text-white">${food.price}</Badge>
                   </div>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -246,8 +246,8 @@ export default function HomePage() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => handleEdit(meal)}>Edit</DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleDelete(meal)} className="text-red-600">
+                      <DropdownMenuItem onClick={() => handleEdit(food)}>Edit</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleDelete(food)} className="text-red-600">
                         Delete
                       </DropdownMenuItem>
                     </DropdownMenuContent>
@@ -256,22 +256,22 @@ export default function HomePage() {
 
                 <div className="p-4">
                   <div className="flex items-center space-x-2 mb-2">
-                    <span className="text-lg">{meal.logo}</span>
-                    <span className="text-sm text-gray-600">{meal.restaurant}</span>
+                    <span className="text-lg">{food.logo || '🍽️'}</span>
+                    <span className="text-sm text-gray-600">{food.restaurant}</span>
                   </div>
 
-                  <h3 className="font-semibold text-gray-900 mb-2">{meal.name}</h3>
+                  <h3 className="font-semibold text-gray-900 mb-2">{food.name}</h3>
 
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-1">
                       <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                      <span className="text-sm text-gray-600">{meal.rating}</span>
+                      <span className="text-sm text-gray-600">{food.rating}</span>
                     </div>
                     <Badge
-                      variant={meal.status === "Open" ? "default" : "secondary"}
-                      className={meal.status === "Open" ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-600"}
+                      variant={food.status === "Open" ? "default" : "secondary"}
+                      className={food.status === "Open" ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-600"}
                     >
-                      {meal.status}
+                      {food.status}
                     </Badge>
                   </div>
                 </div>
@@ -395,14 +395,28 @@ export default function HomePage() {
           </div>
         </div>
       </footer>
-      {/* Add Meal Modal */}
-      <AddMealModal open={showAddModal} onOpenChange={setShowAddModal} />
+      {/* Add Food Modal */}
+      <AddFoodModal 
+        open={showAddModal} 
+        onOpenChange={setShowAddModal} 
+        onAddFood={handleAddFood}
+      />
 
-      {/* Edit Meal Modal */}
-      <EditMealModal open={showEditModal} onOpenChange={setShowEditModal} meal={selectedMeal} />
+      {/* Edit Food Modal */}
+      <EditFoodModal 
+        open={showEditModal} 
+        onOpenChange={setShowEditModal} 
+        food={selectedFood}
+        onUpdateFood={handleUpdateFood}
+      />
 
-      {/* Delete Meal Modal */}
-      <DeleteMealModal open={showDeleteModal} onOpenChange={setShowDeleteModal} meal={selectedMeal} />
+      {/* Delete Food Modal */}
+      <DeleteFoodModal 
+        open={showDeleteModal} 
+        onOpenChange={setShowDeleteModal} 
+        food={selectedFood}
+        onDeleteSuccess={() => selectedFood && handleDeleteFood(selectedFood._id!)}
+      />
     </div>
   )
 }

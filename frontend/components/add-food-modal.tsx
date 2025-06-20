@@ -6,26 +6,15 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { FoodItem } from "@/lib/api";
 
-export interface FoodItem {
-  name: string
-  price: number
-  rating: number
-  image: string
-  restaurant: string
-  status: 'Open' | 'Closed'
-  logo: string
-  category?: string
-  deliveryType?: 'Delivery' | 'Pickup' | 'Both'
+interface AddFoodModalProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onAddFood?: (food: FoodItem) => void;
 }
 
-interface AddMealModalProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  onAddMeal?: (meal: FoodItem) => void
-}
-
-export function AddMealModal({ open, onOpenChange, onAddMeal }: AddMealModalProps) {
+export function AddFoodModal({ open, onOpenChange, onAddFood }: AddFoodModalProps) {
   const [formData, setFormData] = useState<Omit<FoodItem, 'logo' | 'status' | 'deliveryType' | 'category'>>({
     name: "",
     price: 0,
@@ -44,13 +33,12 @@ export function AddMealModal({ open, onOpenChange, onAddMeal }: AddMealModalProp
       setIsSubmitting(true)
       setError(null)
       
-      // Validate required fields
       if (!formData.name || !formData.restaurant || formData.price <= 0) {
         setError('Please fill in all required fields')
         return
       }
 
-      const newMeal = {
+      const newFood = {
         ...formData,
         status,
         deliveryType,
@@ -64,25 +52,25 @@ export function AddMealModal({ open, onOpenChange, onAddMeal }: AddMealModalProp
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(newMeal),
+        body: JSON.stringify(newFood),
       })
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
-        throw new Error(errorData.message || 'Failed to add meal')
+        throw new Error(errorData.message || 'Failed to add food')
       }
 
-      const createdMeal = await response.json()
+      const createdFood = await response.json()
       
-      if (onAddMeal) {
-        onAddMeal(createdMeal)
+      if (onAddFood) {
+        onAddFood(createdFood)
       }
       
       onOpenChange(false)
       resetForm()
     } catch (error) {
-      console.error("Error adding meal:", error)
-      setError(error instanceof Error ? error.message : 'Failed to add meal')
+      console.error("Error adding food:", error)
+      setError(error instanceof Error ? error.message : 'Failed to add food')
     } finally {
       setIsSubmitting(false)
     }
@@ -112,7 +100,7 @@ export function AddMealModal({ open, onOpenChange, onAddMeal }: AddMealModalProp
       <DialogContent className="sm:max-w-[400px] p-0">
         <div className="bg-white rounded-lg">
           <DialogHeader className="p-6 pb-4">
-            <DialogTitle className="text-xl font-semibold text-center text-orange-500">Add a meal</DialogTitle>
+            <DialogTitle className="text-xl font-semibold text-center text-orange-500">Add New Food Item</DialogTitle>
           </DialogHeader>
 
           <div className="px-6 pb-6 space-y-4">

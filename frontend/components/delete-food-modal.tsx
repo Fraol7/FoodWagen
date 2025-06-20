@@ -5,22 +5,22 @@ import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Loader2 } from "lucide-react"
 import { toast } from "sonner"
-import { FoodItem } from "./add-meal-modal"
+import { FoodItem } from "@/lib/api"
 
-interface DeleteMealModalProps {
+interface DeleteFoodModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  meal: FoodItem | null
-  onDeleteSuccess?: (deletedMealId: string) => void
+  food: FoodItem | null
+  onDeleteSuccess?: (deletedFoodId: string) => void
 }
 
-export function DeleteMealModal({ open, onOpenChange, meal, onDeleteSuccess }: DeleteMealModalProps) {
+export function DeleteFoodModal({ open, onOpenChange, food, onDeleteSuccess }: DeleteFoodModalProps) {
   const [isDeleting, setIsDeleting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const handleDelete = async () => {
-    if (!meal?._id) {
-      setError("No meal selected for deletion")
+    if (!food?._id) {
+      setError("No food selected for deletion")
       return
     }
 
@@ -28,7 +28,7 @@ export function DeleteMealModal({ open, onOpenChange, meal, onDeleteSuccess }: D
       setIsDeleting(true)
       setError(null)
       
-      const response = await fetch(`http://localhost:3000/foods/${meal._id}`, {
+      const response = await fetch(`http://localhost:3000/foods/${food._id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -37,15 +37,15 @@ export function DeleteMealModal({ open, onOpenChange, meal, onDeleteSuccess }: D
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
-        throw new Error(errorData.message || 'Failed to delete meal')
+        throw new Error(errorData.message || 'Failed to delete food item')
       }
       
-      toast.success("Meal deleted successfully")
-      onDeleteSuccess?.(meal._id)
+      toast.success("Food item deleted successfully")
+      onDeleteSuccess?.(food._id)
       onOpenChange(false)
     } catch (error) {
-      console.error("Error deleting meal:", error)
-      const errorMessage = error instanceof Error ? error.message : 'Failed to delete meal'
+      console.error("Error deleting food item:", error)
+      const errorMessage = error instanceof Error ? error.message : 'Failed to delete food item'
       setError(errorMessage)
       toast.error(errorMessage)
     } finally {
@@ -64,11 +64,11 @@ export function DeleteMealModal({ open, onOpenChange, meal, onDeleteSuccess }: D
         <div className="bg-white rounded-lg">
           <DialogHeader className="p-6 pb-4">
             <DialogTitle className="text-xl font-semibold text-center text-orange-500">
-              Delete Meal
+              Delete Food Item
             </DialogTitle>
-            {meal?.name && (
+            {food?.name && (
               <DialogDescription className="text-center text-gray-600">
-                {meal.name}
+                {food.name}
               </DialogDescription>
             )}
           </DialogHeader>
@@ -81,7 +81,7 @@ export function DeleteMealModal({ open, onOpenChange, meal, onDeleteSuccess }: D
             )}
             
             <p className="text-center text-gray-600 mb-6">
-              Are you sure you want to delete this meal? This action cannot be undone.
+              Are you sure you want to delete this food item? This action cannot be undone.
             </p>
 
             <div className="flex space-x-3">

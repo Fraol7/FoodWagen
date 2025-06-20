@@ -6,16 +6,16 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { FoodItem } from "./add-meal-modal"
+import { FoodItem } from "@/lib/api"
 
-interface EditMealModalProps {
+interface EditFoodModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  meal: FoodItem | null
-  onUpdateMeal?: (meal: FoodItem) => void
+  food: FoodItem | null
+  onUpdateFood?: (food: FoodItem) => void
 }
 
-export function EditMealModal({ open, onOpenChange, meal: propMeal, onUpdateMeal }: EditMealModalProps) {
+export function EditFoodModal({ open, onOpenChange, food: propFood, onUpdateFood }: EditFoodModalProps) {
   const [formData, setFormData] = useState<Omit<FoodItem, '_id' | 'logo' | 'createdAt' | 'updatedAt'>>({
     name: "",
     price: 0,
@@ -31,23 +31,23 @@ export function EditMealModal({ open, onOpenChange, meal: propMeal, onUpdateMeal
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (propMeal) {
+    if (propFood) {
       setFormData({
-        name: propMeal.name || "",
-        price: propMeal.price || 0,
-        rating: propMeal.rating || 0,
-        image: propMeal.image || "",
-        restaurant: propMeal.restaurant || "",
-        status: propMeal.status || "Open",
-        deliveryType: propMeal.deliveryType || "Delivery",
-        category: propMeal.category || "",
+        name: propFood.name || "",
+        price: propFood.price || 0,
+        rating: propFood.rating || 0,
+        image: propFood.image || "",
+        restaurant: propFood.restaurant || "",
+        status: propFood.status || "Open",
+        deliveryType: propFood.deliveryType || "Delivery",
+        category: propFood.category || "",
       })
     }
-  }, [propMeal])
+  }, [propFood])
 
   const handleSave = async () => {
-    if (!propMeal?._id) {
-      setError("No meal selected for update")
+    if (!propFood?._id) {
+      setError("No food item selected for update")
       return
     }
 
@@ -61,7 +61,7 @@ export function EditMealModal({ open, onOpenChange, meal: propMeal, onUpdateMeal
         return
       }
 
-      const response = await fetch(`http://localhost:3000/foods/${propMeal._id}`, {
+      const response = await fetch(`http://localhost:3000/foods/${propFood._id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -74,16 +74,16 @@ export function EditMealModal({ open, onOpenChange, meal: propMeal, onUpdateMeal
         throw new Error(errorData.message || 'Failed to update meal')
       }
 
-      const updatedMeal = await response.json()
+      const updatedFood = await response.json()
       
-      if (onUpdateMeal) {
-        onUpdateMeal(updatedMeal)
+      if (onUpdateFood) {
+        onUpdateFood(updatedFood)
       }
       
       onOpenChange(false)
     } catch (error) {
-      console.error("Error updating meal:", error)
-      setError(error instanceof Error ? error.message : 'Failed to update meal')
+      console.error("Error updating food item:", error)
+      setError(error instanceof Error ? error.message : 'Failed to update food item')
     } finally {
       setIsSubmitting(false)
     }
@@ -94,7 +94,7 @@ export function EditMealModal({ open, onOpenChange, meal: propMeal, onUpdateMeal
       <DialogContent className="sm:max-w-[400px] p-0">
         <div className="bg-white rounded-lg">
           <DialogHeader className="p-6 pb-4">
-            <DialogTitle className="text-xl font-semibold text-center text-orange-500">Edit Meal</DialogTitle>
+            <DialogTitle className="text-xl font-semibold text-center text-orange-500">Edit Food Item</DialogTitle>
           </DialogHeader>
 
           <div className="px-6 pb-6 space-y-4">
@@ -239,7 +239,7 @@ export function EditMealModal({ open, onOpenChange, meal: propMeal, onUpdateMeal
                 className="flex-1 bg-orange-400 hover:bg-orange-500 text-white"
                 disabled={isSubmitting}
               >
-                {isSubmitting ? 'Saving...' : 'Save Changes'}
+                {isSubmitting ? 'Saving...' : 'Update Food Item'}
               </Button>
               <Button
                 onClick={() => onOpenChange(false)}

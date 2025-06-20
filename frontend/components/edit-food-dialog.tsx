@@ -246,6 +246,7 @@ export function EditFoodDialog({ food, open, onOpenChange, onSave }: EditFoodDia
               </>
             ) : 'Save Changes'}
           </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   )

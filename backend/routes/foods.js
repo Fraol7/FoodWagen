@@ -19,7 +19,9 @@ router.get('/:id', getFood, (req, res) => {
 
 // Create one food
 router.post('/', async (req, res) => {
-  const food = new Food({
+  console.log('Received POST request to create food:', req.body);
+  
+  const food = {
     name: req.body.name,
     price: req.body.price,
     rating: req.body.rating || 0,
@@ -29,13 +31,28 @@ router.post('/', async (req, res) => {
     logo: req.body.logo || '🍽️',
     category: req.body.category,
     deliveryType: req.body.deliveryType || 'Delivery'
-  });
+  };
+
+  // Validate required fields
+  if (!food.name || !food.price || !food.restaurant) {
+    console.error('Validation failed - Missing required fields:', food);
+    return res.status(400).json({ 
+      message: 'Missing required fields: name, price, and restaurant are required' 
+    });
+  }
 
   try {
-    const newFood = await food.save();
+    console.log('Creating new food item in database...');
+    const newFood = await Food.create(food);
+    console.log('Successfully created food item:', newFood);
     res.status(201).json(newFood);
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    console.error('Error creating food item:', err);
+    res.status(400).json({ 
+      message: err.message,
+      error: err,
+      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    });
   }
 });
 
@@ -61,12 +78,38 @@ router.patch('/:id', getFood, async (req, res) => {
 });
 
 // Delete one food
-router.delete('/:id', getFood, async (req, res) => {
+router.delete('/:id', async (req, res) => {
   try {
-    await res.food.remove();
-    res.json({ message: 'Deleted Food' });
+    const foodId = req.params.id;
+    console.log('Deleting food item:', foodId);
+    
+    // First check if the food exists
+    const food = await Food.findById(foodId);
+    if (!food) {
+      console.log('Food item not found:', foodId);
+      return res.status(404).json({
+        success: false,
+        message: 'Food item not found',
+        id: foodId
+      });
+    }
+    
+    // If it exists, delete it
+    await Food.deleteOne({ _id: foodId });
+    
+    console.log('Successfully deleted food item:', foodId);
+    res.status(200).json({ 
+      success: true,
+      message: 'Food item deleted successfully',
+      id: foodId
+    });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error('Error deleting food item:', err);
+    res.status(500).json({ 
+      success: false,
+      message: 'Failed to delete food item',
+      error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    });
   }
 });
 
@@ -75,10 +118,18 @@ async function getFood(req, res, next) {
   try {
     food = await Food.findById(req.params.id);
     if (food == null) {
-      return res.status(404).json({ message: 'Cannot find food' });
+      return res.status(404).json({ 
+        success: false,
+        message: 'Food item not found',
+        id: req.params.id
+      });
     }
   } catch (err) {
-    return res.status(500).json({ message: err.message });
+    return res.status(500).json({ 
+      success: false,
+      message: 'Error finding food item',
+      error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    });
   }
 
   res.food = food;

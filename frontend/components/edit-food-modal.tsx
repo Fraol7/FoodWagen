@@ -56,34 +56,44 @@ export function EditFoodModal({ open, onOpenChange, food: propFood, onUpdateFood
       setError(null)
       
       // Validate required fields
-      if (!formData.name || !formData.restaurant || formData.price <= 0) {
-        setError('Please fill in all required fields')
+      if (!formData.name?.trim() || !formData.restaurant?.trim() || formData.price <= 0) {
+        setError('Please fill in all required fields (name, restaurant, and price)')
         return
       }
 
-      const response = await fetch(`http://localhost:3000/foods/${propFood._id}`, {
+      const updatedFood = {
+        ...formData,
+        logo: '🍽️', // Ensure logo is included
+        image: formData.image || '/placeholder.svg',
+      }
+
+      console.log('Updating food item:', { id: propFood._id, ...updatedFood })
+      
+      const response = await fetch(`http://localhost:5000/api/foods/${propFood._id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(updatedFood),
       })
 
+      const responseData = await response.json().catch(() => ({}))
+      
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        throw new Error(errorData.message || 'Failed to update meal')
+        console.error('Server error response:', response.status, response.statusText, responseData)
+        throw new Error(responseData.message || `Failed to update food: ${response.status} ${response.statusText}`)
       }
 
-      const updatedFood = await response.json()
+      console.log('Successfully updated food:', responseData)
       
       if (onUpdateFood) {
-        onUpdateFood(updatedFood)
+        onUpdateFood(responseData)
       }
       
       onOpenChange(false)
     } catch (error) {
       console.error("Error updating food item:", error)
-      setError(error instanceof Error ? error.message : 'Failed to update food item')
+      setError(error instanceof Error ? error.message : 'Failed to update food item. Please try again.')
     } finally {
       setIsSubmitting(false)
     }

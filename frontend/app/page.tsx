@@ -136,11 +136,17 @@ export default function HomePage() {
 
   const handleDeleteFood = async (id: string) => {
     try {
-      await deleteFood(id);
-      setFoods(foods.filter(food => food._id !== id));
+      const result = await deleteFood(id);
+      if (result.success) {
+        setFoods(prevFoods => prevFoods.filter(food => food._id !== id));
+        setSelectedFood(null);
+        setShowDeleteModal(false);
+      } else {
+        throw new Error(result.message || 'Failed to delete food item');
+      }
     } catch (err) {
       console.error('Failed to delete food item:', err);
-      setError('Failed to delete food item.');
+      setError(err instanceof Error ? err.message : 'Failed to delete food item');
     }
   };
 

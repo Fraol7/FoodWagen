@@ -14,4 +14,4 @@ const foodSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now }
 });
 
-const Food = mongoose.model('Food', foodSchema);
+module.exports = mongoose.model('Food', foodSchema);

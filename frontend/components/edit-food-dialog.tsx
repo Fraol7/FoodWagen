@@ -71,7 +71,7 @@ export function EditFoodDialog({ food, open, onOpenChange, onSave }: EditFoodDia
         return
       }
 
-      const response = await fetch(`http://localhost:3000/foods/${food._id}`, {
+      const response = await fetch(`http://localhost:3000/api/foods/${food._id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

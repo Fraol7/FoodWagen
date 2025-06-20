@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Loader2 } from "lucide-react"
 import { toast } from "sonner"
-import { FoodItem } from "@/lib/api"
+import { FoodItem, deleteFood } from "@/lib/api"
 
 interface DeleteFoodModalProps {
   open: boolean
@@ -28,24 +28,22 @@ export function DeleteFoodModal({ open, onOpenChange, food, onDeleteSuccess }: D
       setIsDeleting(true)
       setError(null)
       
-      const response = await fetch(`http://localhost:3000/foods/${food._id}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        throw new Error(errorData.message || 'Failed to delete food item')
-      }
+      console.log('Deleting food item:', food._id)
       
-      toast.success("Food item deleted successfully")
-      onDeleteSuccess?.(food._id)
-      onOpenChange(false)
+      const result = await deleteFood(food._id)
+      
+      console.log('Successfully deleted food:', result)
+      
+      if (result.success) {
+        toast.success(result.message || "Food item deleted successfully")
+        onDeleteSuccess?.(result.id || food._id)
+        onOpenChange(false)
+      } else {
+        throw new Error(result.message || 'Failed to delete food item')
+      }
     } catch (error) {
       console.error("Error deleting food item:", error)
-      const errorMessage = error instanceof Error ? error.message : 'Failed to delete food item'
+      const errorMessage = error instanceof Error ? error.message : 'Failed to delete food item. Please try again.'
       setError(errorMessage)
       toast.error(errorMessage)
     } finally {

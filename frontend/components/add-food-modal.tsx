@@ -33,8 +33,9 @@ export function AddFoodModal({ open, onOpenChange, onAddFood }: AddFoodModalProp
       setIsSubmitting(true)
       setError(null)
       
-      if (!formData.name || !formData.restaurant || formData.price <= 0) {
-        setError('Please fill in all required fields')
+      // Validate required fields
+      if (!formData.name?.trim() || !formData.restaurant?.trim() || formData.price <= 0) {
+        setError('Please fill in all required fields (name, restaurant, and price)')
         return
       }
 
@@ -47,7 +48,9 @@ export function AddFoodModal({ open, onOpenChange, onAddFood }: AddFoodModalProp
         image: formData.image || '/placeholder.svg',
       }
 
-      const response = await fetch("http://localhost:3000/foods", {
+      console.log('Submitting new food:', newFood)
+      
+      const response = await fetch("http://localhost:5000/api/foods", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -55,22 +58,24 @@ export function AddFoodModal({ open, onOpenChange, onAddFood }: AddFoodModalProp
         body: JSON.stringify(newFood),
       })
 
+      const responseData = await response.json().catch(() => ({}))
+      
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        throw new Error(errorData.message || 'Failed to add food')
+        console.error('Server error response:', response.status, response.statusText, responseData)
+        throw new Error(responseData.message || `Failed to add food: ${response.status} ${response.statusText}`)
       }
 
-      const createdFood = await response.json()
+      console.log('Successfully created food:', responseData)
       
       if (onAddFood) {
-        onAddFood(createdFood)
+        onAddFood(responseData)
       }
       
       onOpenChange(false)
       resetForm()
     } catch (error) {
       console.error("Error adding food:", error)
-      setError(error instanceof Error ? error.message : 'Failed to add food')
+      setError(error instanceof Error ? error.message : 'Failed to add food. Please try again.')
     } finally {
       setIsSubmitting(false)
     }

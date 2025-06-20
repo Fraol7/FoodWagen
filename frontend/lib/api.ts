@@ -1,5 +1,5 @@
 // API configuration
-const API_BASE_URL = 'http://localhost:3000/foods';
+const API_BASE_URL = 'http://localhost:5000/api/foods';
 
 export interface FoodItem {
   _id?: string;
@@ -61,11 +61,27 @@ export const updateFood = async (id: string, food: Partial<FoodItem>): Promise<F
   return response.json();
 };
 
-export const deleteFood = async (id: string): Promise<void> => {
+export const deleteFood = async (id: string): Promise<{ success: boolean; message: string; id: string }> => {
   const response = await fetch(`${API_BASE_URL}/${id}`, {
     method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
   });
-  if (!response.ok) {
-    throw new Error('Failed to delete food');
+  
+  const responseData = await response.json().catch(() => ({
+    success: false,
+    message: 'Failed to parse server response',
+    id
+  }));
+  
+  if (!response.ok || !responseData.success) {
+    throw new Error(responseData.message || 'Failed to delete food');
   }
+  
+  return {
+    success: true,
+    message: responseData.message || 'Food deleted successfully',
+    id: responseData.id || id
+  };
 };

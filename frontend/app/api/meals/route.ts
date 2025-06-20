@@ -19,7 +19,7 @@ export async function GET() {
         name: "Bow Lasagna",
         price: 2.99,
         rating: 4.5,
-        image: "/placeholder.svg?height=200&width=300",
+        image: "/images/food.png",
         restaurant: "Denny's",
         status: "Closed",
         logo: "🍽️",

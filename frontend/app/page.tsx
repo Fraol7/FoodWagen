@@ -19,7 +19,7 @@ const defaultFoods: FoodItem[] = [
     name: "Bow Lasagna",
     price: 2.99,
     rating: 4.5,
-    image: "/images/placeholder.svg?height=200&width=300",
+    image: "/images/images/food.png",
     restaurant: "Denny's",
     status: "Closed",
     logo: "🍗",
@@ -29,7 +29,7 @@ const defaultFoods: FoodItem[] = [
     name: "Mixed Avocado Smoothie",
     price: 5.99,
     rating: 4.8,
-    image: "/images/placeholder.svg?height=200&width=300",
+    image: "/images/images/food.png",
     restaurant: "Fruit King",
     status: "Closed",
     logo: "🍗",
@@ -39,7 +39,7 @@ const defaultFoods: FoodItem[] = [
     name: "Pancake",
     price: 3.99,
     rating: 5.0,
-    image: "/images/placeholder.svg?height=200&width=300",
+    image: "/images/images/food.png",
     restaurant: "Pancake House",
     status: "Open",
     logo: "🥞",
@@ -49,7 +49,7 @@ const defaultFoods: FoodItem[] = [
     name: "Cupcake",
     price: 1.99,
     rating: 4.7,
-    image: "/images/placeholder.svg?height=200&width=300",
+    image: "/images/images/food.png",
     restaurant: "Sweet Tooth",
     status: "Open",
     logo: "🧁",
@@ -59,7 +59,7 @@ const defaultFoods: FoodItem[] = [
     name: "Burger",
     price: 8.99,
     rating: 4.6,
-    image: "/images/placeholder.svg?height=200&width=300",
+    image: "/images/images/food.png",
     restaurant: "Burger Joint",
     status: "Open",
     logo: "🥩",
@@ -69,7 +69,7 @@ const defaultFoods: FoodItem[] = [
     name: "Pizza",
     price: 12.99,
     rating: 4.9,
-    image: "/images/placeholder.svg?height=200&width=300",
+    image: "/images/images/food.png",
     restaurant: "Pizza Palace",
     status: "Open",
     logo: "🍗",
@@ -79,7 +79,7 @@ const defaultFoods: FoodItem[] = [
     name: "Salad",
     price: 7.99,
     rating: 4.3,
-    image: "/images/placeholder.svg?height=200&width=300",
+    image: "/images/images/food.png",
     restaurant: "Healthy Bites",
     status: "Open",
     logo: "🍗",
@@ -89,7 +89,7 @@ const defaultFoods: FoodItem[] = [
     name: "Breakfast Platter",
     price: 11.99,
     rating: 4.9,
-    image: "/images/placeholder.svg?height=200&width=300",
+    image: "/images/images/food.png",
     restaurant: "Breakfast Club",
     status: "Open",
     logo: "🍗",
@@ -129,7 +129,7 @@ export default function HomePage() {
   };
 
   const handleUpdateFood = (updatedFood: FoodItem) => {
-    setFoods(foods.map(food => 
+    setFoods(foods.map(food =>
       food._id === updatedFood._id ? updatedFood : food
     ));
   };
@@ -396,24 +396,24 @@ export default function HomePage() {
         </div>
       </footer>
       {/* Add Food Modal */}
-      <AddFoodModal 
-        open={showAddModal} 
-        onOpenChange={setShowAddModal} 
+      <AddFoodModal
+        open={showAddModal}
+        onOpenChange={setShowAddModal}
         onAddFood={handleAddFood}
       />
 
       {/* Edit Food Modal */}
-      <EditFoodModal 
-        open={showEditModal} 
-        onOpenChange={setShowEditModal} 
+      <EditFoodModal
+        open={showEditModal}
+        onOpenChange={setShowEditModal}
         food={selectedFood}
         onUpdateFood={handleUpdateFood}
       />
 
       {/* Delete Food Modal */}
-      <DeleteFoodModal 
-        open={showDeleteModal} 
-        onOpenChange={setShowDeleteModal} 
+      <DeleteFoodModal
+        open={showDeleteModal}
+        onOpenChange={setShowDeleteModal}
         food={selectedFood}
         onDeleteSuccess={() => selectedFood && handleDeleteFood(selectedFood._id!)}
       />

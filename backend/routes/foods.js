@@ -21,9 +21,14 @@ router.get('/:id', getFood, (req, res) => {
 router.post('/', async (req, res) => {
   const food = new Food({
     name: req.body.name,
-    rating: req.body.rating,
-    image: req.body.image,
-    restaurant: req.body.restaurant
+    price: req.body.price,
+    rating: req.body.rating || 0,
+    image: req.body.image || '/placeholder.svg',
+    restaurant: req.body.restaurant,
+    status: req.body.status || 'Open',
+    logo: req.body.logo || '🍽️',
+    category: req.body.category,
+    deliveryType: req.body.deliveryType || 'Delivery'
   });
 
   try {
@@ -36,18 +41,15 @@ router.post('/', async (req, res) => {
 
 // Update one food
 router.patch('/:id', getFood, async (req, res) => {
-  if (req.body.name != null) {
-    res.food.name = req.body.name;
-  }
-  if (req.body.rating != null) {
-    res.food.rating = req.body.rating;
-  }
-  if (req.body.image != null) {
-    res.food.image = req.body.image;
-  }
-  if (req.body.restaurant != null) {
-    res.food.restaurant = req.body.restaurant;
-  }
+  const allowedUpdates = ['name', 'price', 'rating', 'image', 'restaurant', 'status', 'logo', 'category', 'deliveryType'];
+  
+  // Only update fields that are passed in the request and are allowed
+  Object.keys(req.body).forEach(update => {
+    if (allowedUpdates.includes(update)) {
+      res.food[update] = req.body[update];
+    }
+  });
+  
   res.food.updatedAt = Date.now();
 
   try {

@@ -6,99 +6,143 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { AddMealModal } from "@/components/add-meal-modal"
 import { EditMealModal } from "@/components/edit-meal-modal"
 import { DeleteMealModal } from "@/components/delete-meal-modal"
+import { FoodItem, getFoods, deleteFood } from "@/lib/api"
 
-const featuredMeals = [
+// Default featured meals in case API is not available
+const defaultMeals = [
   {
-    id: 1,
+    _id: '1',
     name: "Bow Lasagna",
     price: 2.99,
     rating: 4.5,
-    image: "/placeholder.svg?height=200&width=300",
+    image: "/images/placeholder.svg?height=200&width=300",
     restaurant: "Denny's",
     status: "Closed",
     logo: "🍽️",
   },
   {
-    id: 2,
+    _id: '2',
     name: "Mixed Avocado Smoothie",
     price: 5.99,
     rating: 4.8,
-    image: "/placeholder.svg?height=200&width=300",
+    image: "/images/placeholder.svg?height=200&width=300",
     restaurant: "Fruit King",
     status: "Closed",
     logo: "🥑",
   },
   {
-    id: 3,
+    _id: '3',
     name: "Pancake",
     price: 3.99,
     rating: 5.0,
-    image: "/placeholder.svg?height=200&width=300",
+    image: "/images/placeholder.svg?height=200&width=300",
     restaurant: "Pancake House",
     status: "Open",
     logo: "🥞",
   },
   {
-    id: 4,
+    _id: '4',
     name: "Cupcake",
     price: 1.99,
     rating: 4.2,
-    image: "/placeholder.svg?height=200&width=300",
+    image: "/images/placeholder.svg?height=200&width=300",
     restaurant: "Sweet Treats",
     status: "Open",
     logo: "🧁",
   },
   {
-    id: 5,
+    _id: '5',
     name: "Creamy Steak",
     price: 12.99,
     rating: 4.5,
-    image: "/placeholder.svg?height=200&width=300",
+    image: "/images/placeholder.svg?height=200&width=300",
     restaurant: "Steaky",
     status: "Open",
     logo: "🥩",
   },
   {
-    id: 6,
+    _id: '6',
     name: "Steak with Potatoes",
     price: 15.99,
     rating: 4.7,
-    image: "/placeholder.svg?height=200&width=300",
+    image: "/images/placeholder.svg?height=200&width=300",
     restaurant: "KFC",
     status: "Open",
     logo: "🍗",
   },
   {
-    id: 7,
+    _id: '7',
     name: "Indian Spicy Soup",
     price: 9.99,
     rating: 4.5,
-    image: "/placeholder.svg?height=200&width=300",
+    image: "/images/placeholder.svg?height=200&width=300",
     restaurant: "Spice Palace",
     status: "Open",
     logo: "🍛",
   },
   {
-    id: 8,
+    _id: '8',
     name: "Steak Omelet",
     price: 11.99,
     rating: 4.9,
-    image: "/placeholder.svg?height=200&width=300",
+    image: "/images/placeholder.svg?height=200&width=300",
     restaurant: "Breakfast Club",
     status: "Open",
     logo: "🍳",
   },
-]
+];
 
 export default function HomePage() {
-  const [showAddModal, setShowAddModal] = useState(false)
-  const [showEditModal, setShowEditModal] = useState(false)
-  const [showDeleteModal, setShowDeleteModal] = useState(false)
-  const [selectedMeal, setSelectedMeal] = useState<any>(null)
+  const [meals, setMeals] = useState<FoodItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedMeal, setSelectedMeal] = useState<FoodItem | null>(null);
+
+  // Fetch meals from the API
+  useEffect(() => {
+    const fetchMeals = async () => {
+      try {
+        setLoading(true);
+        const data = await getFoods();
+        setMeals(data);
+      } catch (err) {
+        console.error('Failed to fetch meals:', err);
+        setError('Failed to load meals. Using sample data.');
+        setMeals(defaultMeals);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMeals();
+  }, []);
+
+  const handleAddMeal = (newMeal: FoodItem) => {
+    setMeals([...meals, newMeal]);
+  };
+
+  const handleUpdateMeal = (updatedMeal: FoodItem) => {
+    setMeals(meals.map(meal => 
+      meal._id === updatedMeal._id ? updatedMeal : meal
+    ));
+  };
+
+  const handleDeleteMeal = async (id: string) => {
+    try {
+      await deleteFood(id);
+      setMeals(meals.filter(meal => meal._id !== id));
+    } catch (err) {
+      console.error('Failed to delete meal:', err);
+      setError('Failed to delete meal.');
+    }
+  };
 
   const handleEdit = (meal: any) => {
     setSelectedMeal(meal)
@@ -179,9 +223,9 @@ export default function HomePage() {
           <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">Featured Meals</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredMeals.map((meal) => (
+            {defaultMeals.map((meal) => (
               <div
-                key={meal.id}
+                key={meal._id}
                 className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
               >
                 <div className="relative">

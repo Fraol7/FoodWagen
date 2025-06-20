@@ -152,7 +152,7 @@ export default function HomePage() {
                 <div className="flex space-x-2">
                   <div className="flex-1 relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                    <Input placeholder="What do you like to eat today?" className="pl-10 h-12 border-gray-200" />
+                    <Input placeholder="What do you like to eat today?" className="pl-10 h-12 border-gray-200 text-gray-900" />
                   </div>
                   <Button className="bg-orange-500 hover:bg-orange-600 text-white px-6 h-12">Find Meal</Button>
                 </div>
@@ -162,7 +162,7 @@ export default function HomePage() {
             <div className="relative">
               <div className="relative w-full h-96 lg:h-[500px]">
                 <Image
-                  src="/placeholder.svg?height=500&width=500"
+                  src="/images/food.png"
                   alt="Delicious noodle bowl"
                   fill
                   className="object-cover rounded-full"
@@ -186,7 +186,7 @@ export default function HomePage() {
               >
                 <div className="relative">
                   <Image
-                    src={meal.image || "/placeholder.svg"}
+                    src={meal.image || "/images/food.png"}
                     alt={meal.name}
                     width={300}
                     height={200}
